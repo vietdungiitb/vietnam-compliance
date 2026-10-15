@@ -23,7 +23,7 @@ add_to_apps_screen = [
         "name": "vietnam_compliance",
         "logo": "/assets/vietnam_compliance/images/vietnam.svg",
         "title": "Tuân thủ VN",
-        "route": "/app/tuan-thu-vn",
+        "route": "/desk/vietnam-compliance",
     }
 ]
 
