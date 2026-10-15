@@ -23,15 +23,15 @@ required_apps = ["frappe", "erpnext", "hrms"]
 # Lifecycle
 # ---------------------------------------------------------------------------
 
-after_install = "vietnam_compliance.erpnext_vietnam.setup.after_install"
-before_uninstall = "vietnam_compliance.erpnext_vietnam.setup.before_uninstall"
+after_install = "vietnam_compliance.vietnam_compliance.setup.after_install"
+before_uninstall = "vietnam_compliance.vietnam_compliance.setup.before_uninstall"
 
 # ---------------------------------------------------------------------------
 # Setup Wizard
 # ---------------------------------------------------------------------------
 
 setup_wizard_requires = "assets/vietnam_compliance/js/setup_wizard.js"
-setup_wizard_stages = "vietnam_compliance.erpnext_vietnam.setup.get_setup_stages"
+setup_wizard_stages = "vietnam_compliance.vietnam_compliance.setup.get_setup_stages"
 
 # ---------------------------------------------------------------------------
 # DocType Events
