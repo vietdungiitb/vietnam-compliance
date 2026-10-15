@@ -1,0 +1,2 @@
+# Patches for vietnam_compliance go here, one per line.
+# Example: vietnam_compliance.patches.v0_1.migrate_something

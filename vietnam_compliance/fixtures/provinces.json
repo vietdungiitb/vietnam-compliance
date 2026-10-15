@@ -1,0 +1,274 @@
+[
+    {
+        "doctype": "VN Province",
+        "name": "Hà Nội",
+        "province_name": "Hà Nội",
+        "province_code": "01",
+        "wage_region": "I",
+        "tax_authority_code": "HNO"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Hải Phòng",
+        "province_name": "Hải Phòng",
+        "province_code": "31",
+        "wage_region": "I",
+        "tax_authority_code": "HPH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Huế",
+        "province_name": "Huế",
+        "province_code": "46",
+        "wage_region": "II",
+        "tax_authority_code": "TTH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Đà Nẵng",
+        "province_name": "Đà Nẵng",
+        "province_code": "48",
+        "wage_region": "I",
+        "tax_authority_code": "DNG"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "TP. Hồ Chí Minh",
+        "province_name": "TP. Hồ Chí Minh",
+        "province_code": "79",
+        "wage_region": "I",
+        "tax_authority_code": "HCM"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Cần Thơ",
+        "province_name": "Cần Thơ",
+        "province_code": "92",
+        "wage_region": "I",
+        "tax_authority_code": "CTH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Cao Bằng",
+        "province_name": "Cao Bằng",
+        "province_code": "04",
+        "wage_region": "IV",
+        "tax_authority_code": "CBG"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Tuyên Quang",
+        "province_name": "Tuyên Quang",
+        "province_code": "08",
+        "wage_region": "IV",
+        "tax_authority_code": "TQG"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Lào Cai",
+        "province_name": "Lào Cai",
+        "province_code": "10",
+        "wage_region": "III",
+        "tax_authority_code": "LCI"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Điện Biên",
+        "province_name": "Điện Biên",
+        "province_code": "11",
+        "wage_region": "IV",
+        "tax_authority_code": "DBN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Lai Châu",
+        "province_name": "Lai Châu",
+        "province_code": "12",
+        "wage_region": "IV",
+        "tax_authority_code": "LCU"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Sơn La",
+        "province_name": "Sơn La",
+        "province_code": "14",
+        "wage_region": "IV",
+        "tax_authority_code": "SLA"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Hòa Bình",
+        "province_name": "Hòa Bình",
+        "province_code": "17",
+        "wage_region": "III",
+        "tax_authority_code": "HBH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Thái Nguyên",
+        "province_name": "Thái Nguyên",
+        "province_code": "19",
+        "wage_region": "II",
+        "tax_authority_code": "TNN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Lạng Sơn",
+        "province_name": "Lạng Sơn",
+        "province_code": "20",
+        "wage_region": "III",
+        "tax_authority_code": "LSN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Quảng Ninh",
+        "province_name": "Quảng Ninh",
+        "province_code": "22",
+        "wage_region": "I",
+        "tax_authority_code": "QNH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Phú Thọ",
+        "province_name": "Phú Thọ",
+        "province_code": "25",
+        "wage_region": "II",
+        "tax_authority_code": "PTH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Bắc Ninh",
+        "province_name": "Bắc Ninh",
+        "province_code": "27",
+        "wage_region": "I",
+        "tax_authority_code": "BNH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Hưng Yên",
+        "province_name": "Hưng Yên",
+        "province_code": "33",
+        "wage_region": "II",
+        "tax_authority_code": "HYN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Thái Bình",
+        "province_name": "Thái Bình",
+        "province_code": "34",
+        "wage_region": "III",
+        "tax_authority_code": "TBH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Ninh Bình",
+        "province_name": "Ninh Bình",
+        "province_code": "37",
+        "wage_region": "III",
+        "tax_authority_code": "NBH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Thanh Hóa",
+        "province_name": "Thanh Hóa",
+        "province_code": "38",
+        "wage_region": "III",
+        "tax_authority_code": "THA"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Nghệ An",
+        "province_name": "Nghệ An",
+        "province_code": "40",
+        "wage_region": "III",
+        "tax_authority_code": "NAN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Hà Tĩnh",
+        "province_name": "Hà Tĩnh",
+        "province_code": "42",
+        "wage_region": "III",
+        "tax_authority_code": "HTH"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Quảng Trị",
+        "province_name": "Quảng Trị",
+        "province_code": "45",
+        "wage_region": "III",
+        "tax_authority_code": "QTR"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Quảng Ngãi",
+        "province_name": "Quảng Ngãi",
+        "province_code": "51",
+        "wage_region": "III",
+        "tax_authority_code": "QNI"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Gia Lai",
+        "province_name": "Gia Lai",
+        "province_code": "64",
+        "wage_region": "III",
+        "tax_authority_code": "GLA"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Khánh Hòa",
+        "province_name": "Khánh Hòa",
+        "province_code": "56",
+        "wage_region": "II",
+        "tax_authority_code": "KHA"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Đắk Lắk",
+        "province_name": "Đắk Lắk",
+        "province_code": "66",
+        "wage_region": "III",
+        "tax_authority_code": "DLK"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Lâm Đồng",
+        "province_name": "Lâm Đồng",
+        "province_code": "68",
+        "wage_region": "II",
+        "tax_authority_code": "LDG"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Đồng Nai",
+        "province_name": "Đồng Nai",
+        "province_code": "75",
+        "wage_region": "I",
+        "tax_authority_code": "DNI"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Bình Dương",
+        "province_name": "Bình Dương",
+        "province_code": "74",
+        "wage_region": "I",
+        "tax_authority_code": "BDG"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Long An",
+        "province_name": "Long An",
+        "province_code": "80",
+        "wage_region": "II",
+        "tax_authority_code": "LAN"
+    },
+    {
+        "doctype": "VN Province",
+        "name": "Cà Mau",
+        "province_name": "Cà Mau",
+        "province_code": "96",
+        "wage_region": "II",
+        "tax_authority_code": "CMA"
+    }
+]
