@@ -9,13 +9,23 @@ This module registers all integration points with Frappe/ERPNext:
 """
 
 app_name = "vietnam_compliance"
-app_title = "Vietnam Compliance"
+app_title = "Tuân thủ VN"
 app_publisher = "Edusuccess & Open Source Contributors"
 app_description = "Vietnam Statutory Compliance & Localization for Frappe / ERPNext v16"
 app_email = "tech@edusuccess.vn"
 app_license = "GPL-3.0"
 app_icon = "octicon octicon-globe"
 app_color = "#DA251D"  # Vietnamese flag red
+
+# Hiển thị icon trên màn hình chuyển đổi ứng dụng Desk (App Switcher)
+add_to_apps_screen = [
+    {
+        "name": "vietnam_compliance",
+        "logo": "/assets/vietnam_compliance/images/vietnam.svg",
+        "title": "Tuân thủ VN",
+        "route": "/app/tuan-thu-vn",
+    }
+]
 
 required_apps = ["frappe", "erpnext", "hrms"]
 
