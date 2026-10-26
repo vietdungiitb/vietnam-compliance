@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"header1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Tuân thủ Pháp lý & Bản địa hóa Việt Nam</span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"card\",\"data\":{\"card_name\":\"Địa giới hành chính\",\"col\":4}},{\"id\":\"card2\",\"type\":\"card\",\"data\":{\"card_name\":\"Hóa đơn điện tử\",\"col\":4}},{\"id\":\"card3\",\"type\":\"card\",\"data\":{\"card_name\":\"Tiền lương & Thuế\",\"col\":4}},{\"id\":\"card4\",\"type\":\"card\",\"data\":{\"card_name\":\"Báo cáo Kế toán & Thuế\",\"col\":12}}]",
+ "content": "[{\"id\": \"header1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tuân thủ Pháp lý & Bản địa hóa Việt Nam</b></span>\", \"col\": 12}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"34 Tỉnh thành\", \"col\": 4}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Cấu hình HĐĐT\", \"col\": 4}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Cấu hình Lương & Thuế\", \"col\": 4}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"card1\", \"type\": \"card\", \"data\": {\"card_name\": \"Địa giới hành chính\", \"col\": 4}}, {\"id\": \"card2\", \"type\": \"card\", \"data\": {\"card_name\": \"Hóa đơn điện tử\", \"col\": 4}}, {\"id\": \"card3\", \"type\": \"card\", \"data\": {\"card_name\": \"Tiền lương & Thuế\", \"col\": 4}}, {\"id\": \"card4\", \"type\": \"card\", \"data\": {\"card_name\": \"Báo cáo Kế toán & Thuế\", \"col\": 12}}]",
  "creation": "2026-10-15 00:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -17,13 +17,12 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Địa giới hành chính",
-   "link_count": 1,
+   "link_count": 0,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
    "label": "34 Tỉnh / Thành phố",
@@ -37,13 +36,12 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Hóa đơn điện tử",
-   "link_count": 2,
+   "link_count": 0,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
    "label": "Cấu hình HĐĐT",
@@ -54,7 +52,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
    "label": "Nhật ký gửi HĐĐT",
@@ -68,13 +65,12 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Tiền lương & Thuế",
-   "link_count": 2,
+   "link_count": 0,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
    "label": "Cấu hình Lương & Thuế",
@@ -85,7 +81,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
    "label": "Thông tin thuế nhân sự",
@@ -99,16 +94,15 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Báo cáo Kế toán & Thuế",
-   "link_count": 5,
+   "link_count": 0,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Bảng kê hóa đơn",
+   "label": "Bảng kê hoá đơn",
    "link_count": 0,
    "link_to": "VN Bảng Kê Hóa Đơn",
    "link_type": "Report",
@@ -116,7 +110,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 1,
    "label": "Bảng lương tháng",
@@ -127,7 +120,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 1,
    "label": "Báo cáo thuế TNCN",
@@ -138,7 +130,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 1,
    "label": "Sổ cái kế toán",
@@ -149,7 +140,6 @@
    "type": "Link"
   },
   {
-   "dependencies": "",
    "hidden": 0,
    "is_query_report": 1,
    "label": "Cân đối phát sinh",
@@ -160,7 +150,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-10-15 00:00:00.000000",
+ "modified": "2026-10-26 15:50:00.000000",
  "modified_by": "Administrator",
  "module": "Vietnam Compliance",
  "name": "Vietnam Compliance",
@@ -191,7 +181,7 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Cấu hình Lương",
+   "label": "Cấu hình Lương & Thuế",
    "link_to": "VN Payroll Settings",
    "type": "DocType"
   }
