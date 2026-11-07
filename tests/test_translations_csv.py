@@ -99,6 +99,20 @@ def test_no_non_translation_rows():
     )
 
 
+def test_khong_dung_tu_giang_vien():
+    """SSOT term is "Giáo viên" (Edusuccess, 2026-11-07) - not "Giảng viên".
+
+    This repo is the source of the vendor translation; keeping "giảng viên" here
+    forces every consuming site to override it again. Fix at the source.
+    """
+    offenders = [
+        (index, row[0], row[1])
+        for index, row in enumerate(_rows()[1:], start=2)
+        if len(row) > 1 and "giảng viên" in (row[1] or "").lower()
+    ]
+    assert not offenders, f"dùng 'giảng viên' thay vì 'giáo viên': {offenders[:5]}"
+
+
 def test_no_replacement_characters():
     """``U+FFFD`` means Vietnamese text was corrupted during editing."""
     text = CSV_PATH.read_text(encoding="utf-8")
