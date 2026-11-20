@@ -52,7 +52,8 @@ def get_provider() -> BaseEInvoiceProvider:
 def on_sales_invoice_submit(doc, method=None) -> None:
     """Auto-send e-invoice on Sales Invoice submit when configured."""
     settings = frappe.get_single("VN E Invoice Settings")
-    if not settings.provider or not settings.auto_send_on_submit:
+    # F-06: master switch — silent until explicitly enabled and configured.
+    if not settings.enabled or not settings.provider or not settings.auto_send_on_submit:
         return
 
     country = frappe.get_cached_value("Company", doc.company, "country")

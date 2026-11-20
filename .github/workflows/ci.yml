@@ -18,9 +18,11 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Ruff check
-        run: ruff check erpnextvn/ || true
+        run: ruff check vietnam_compliance/
+      # Pre-existing formatting debt in legacy report shims — tracked separately;
+      # lint (`ruff check`) is enforced strictly above.
       - name: Ruff format check
-        run: ruff format --check erpnextvn/ || true
+        run: ruff format --check vietnam_compliance/ || true
 
   test:
     name: Test pure-Python utilities
@@ -32,8 +34,8 @@ jobs:
           python-version: "3.11"
       - name: Install pytest
         run: pip install pytest
-      - name: Run pytest
-        run: python -m pytest tests/ -v --tb=short
+      - name: Run pytest (pure utilities + print-format checks)
+        run: python -m pytest tests/ vietnam_compliance/tests/ -v --tb=short
 
   validate-json:
     name: Validate JSON fixtures
@@ -48,7 +50,7 @@ jobs:
           python - <<'EOF'
           import json, glob, sys
           failed = False
-          for f in sorted(glob.glob("erpnextvn/**/*.json", recursive=True)):
+          for f in sorted(glob.glob("vietnam_compliance/**/*.json", recursive=True)):
               try:
                   json.load(open(f))
               except Exception as exc:
@@ -67,4 +69,4 @@ jobs:
           python-version: "3.11"
       - name: py_compile
         run: |
-          python -m compileall -q erpnextvn/
+          python -m compileall -q vietnam_compliance/
