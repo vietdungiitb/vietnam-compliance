@@ -17,8 +17,22 @@ class TestTemplateContent(unittest.TestCase):
     def test_hoa_don_khong_chiu_thue(self) -> None:
         html = html_of("vn_hoa_don_ban_hang")
         self.assertIn("không chịu thuế GTGT", html)
-        self.assertNotIn("Tiền thuế GTGT:", html)
         self.assertIn("so_tien_bang_chu(doc.rounded_total or doc.grand_total)", html)
+
+    def test_hoa_don_kct_flag_dieu_khien_hien_thi(self) -> None:
+        """F-07: KCT note vs VAT row depends on `vn_is_kct` / tax amount."""
+        html = html_of("vn_hoa_don_ban_hang")
+        self.assertIn("doc.vn_is_kct or not doc.total_taxes_and_charges", html)
+        self.assertIn("{% else %}", html)
+        self.assertIn("Tiền thuế GTGT:", html)
+        self.assertIn("format_vnd(doc.total_taxes_and_charges)", html)
+
+    def test_hoa_don_co_flag_kct(self) -> None:
+        """F-07: flag field must exist in Sales Invoice custom fields."""
+        setup = (
+            Path(__file__).resolve().parents[1] / "vietnam_compliance" / "setup.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"fieldname": "vn_is_kct"', setup)
 
     def test_hoa_don_co_qr_tuy_chon(self) -> None:
         html = html_of("vn_hoa_don_ban_hang")

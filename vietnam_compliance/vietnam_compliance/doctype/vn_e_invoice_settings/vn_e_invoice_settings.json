@@ -5,6 +5,7 @@
     "engine": "InnoDB",
     "field_order": [
         "provider",
+        "enabled",
         "section_api",
         "api_url",
         "sandbox_mode",
@@ -18,14 +19,18 @@
         "certificate_file",
         "certificate_password",
         "section_invoice_cfg",
+        "invoice_type",
         "template_code",
         "series_symbol",
         "tax_authority_code",
+        "tvan_contract_no",
         "section_auto",
         "auto_send_on_submit"
     ],
     "fields": [
         {"fieldname": "provider", "fieldtype": "Select", "label": "Nhà cung cấp", "options": "\nViettel\nVNPT\nMISA\nFPT\nBKAV", "reqd": 1},
+
+        {"fieldname": "enabled", "fieldtype": "Check", "label": "Kích hoạt hóa đơn điện tử", "default": "0"},
 
         {"fieldname": "section_api", "fieldtype": "Section Break", "label": "Kết nối API"},
         {"fieldname": "api_url", "fieldtype": "Data", "label": "API URL"},
@@ -46,13 +51,16 @@
         {"fieldname": "template_code", "fieldtype": "Data", "label": "Mã mẫu hóa đơn"},
         {"fieldname": "series_symbol", "fieldtype": "Data", "label": "Ký hiệu hóa đơn"},
         {"fieldname": "tax_authority_code", "fieldtype": "Data", "label": "Mã cơ quan thuế"},
+        {"fieldname": "tvan_contract_no", "fieldtype": "Data", "label": "Số hợp đồng T-VAN (NĐ 254/2026)"},
+
+        {"fieldname": "invoice_type", "fieldtype": "Select", "label": "Loại HĐ (NĐ 254/2026)", "options": "01GTKT\n02GTTT", "default": "01GTKT"},
 
         {"fieldname": "section_auto", "fieldtype": "Section Break", "label": "Tự động"},
         {"fieldname": "auto_send_on_submit", "fieldtype": "Check", "label": "Tự động phát hành khi xác nhận hóa đơn"}
     ],
     "issingle": 1,
     "links": [],
-    "modified": "2025-01-01 00:00:00",
+    "modified": "2026-11-20 04:10:00.000000",
     "modified_by": "Administrator",
     "module": "Vietnam Compliance",
     "name": "VN E Invoice Settings",

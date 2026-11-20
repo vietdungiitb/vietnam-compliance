@@ -134,7 +134,7 @@ class VNPTProvider(BaseEInvoiceProvider):
             raise EInvoiceSendError(f"VNPT PDF download failed: {exc}") from exc
 
     def _build_payload(self, invoice_data: dict) -> dict[str, Any]:
-        seller = invoice_data["seller"]
+        _seller = invoice_data["seller"]
         buyer = invoice_data["buyer"]
         inv = invoice_data["invoice"]
 

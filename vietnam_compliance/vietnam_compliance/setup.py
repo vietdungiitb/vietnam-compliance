@@ -27,6 +27,13 @@ def after_install() -> None:
     load_provinces()
     add_custom_fields()
     add_address_template()
+    # F-10: without VN defaults a fresh site keeps ERPNext Classic and never
+    # renders the VN templates (KCT note, CSS, payment reason).
+    from vietnam_compliance.vietnam_compliance.print_format_defaults import (
+        set_default_print_formats,
+    )
+
+    set_default_print_formats()
     frappe.db.commit()
     print("✅ Vietnam Compliance: Installation complete")
 
@@ -331,6 +338,16 @@ def _custom_field_definitions() -> dict:
                 "insert_after": "vn_einvoice_lookup_code",
                 "read_only": 1,
                 "no_copy": 1,
+                "module": "Vietnam Compliance",
+            },
+            {
+                # F-07: mark tuition invoices as non-VAT (KCT). The VN invoice
+                # template shows the KCT note vs the VAT row based on this flag.
+                "fieldname": "vn_is_kct",
+                "label": "Không chịu thuế GTGT (KCT)",
+                "fieldtype": "Check",
+                "insert_after": "vn_einvoice_section",
+                "default": "0",
                 "module": "Vietnam Compliance",
             },
         ],
