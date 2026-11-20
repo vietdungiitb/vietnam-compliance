@@ -1,7 +1,7 @@
 # S-VN — vietnam-compliance: đóng F-06…F-10
 
 > **Ngày:** 20/11/2026 · **Repo:** `vietdungiitb/vietnam-compliance` (clone freshest @ `11c05ab`)
-> **Phạm vi:** 5 finding còn lại của audit tổng thể ERP-Edusuccess thuộc repo công ty.
+> **Phạm vi:** 5 finding còn lại của audit tổng thể erpedusuccess thuộc repo công ty.
 
 ## 1. Kết quả
 
@@ -33,6 +33,6 @@ python -m compileall -q vietnam_compliance/       → exit 0
 - Bench/site: `after_install` chạy Property Setter, render PDF có CSS/KCT, `frappe.get_single("VN E Invoice Settings").enabled` trên site thật — **CHƯA CHẠY** (không có site trong repo này).
 - Endpoint API của 5 provider HĐĐT (Viettel/VNPT/MISA/FPT/BKAV) chưa đối chiếu tài liệu vendor — code cũ chỉ mang tính minh hoạ; **CHƯA XÁC MINH**.
 - KTT (kế toán trưởng) cần ký bổ sung cho nội dung KCT theo commit `527bee1` — sandbox cho phép, production phải ký thật.
-- `docs/COMPLIANCE-VN.md` (cites NĐ 13/2023) nằm ở repo ERP-Edusuccess — cross-repo handoff, không sửa ở đây.
+- `docs/COMPLIANCE-VN.md` (cites NĐ 13/2023) nằm ở repo erpedusuccess — cross-repo handoff, không sửa ở đây.
 
 *Tài liệu là bằng chứng theo `documentation-evidence-rule.md`.*
