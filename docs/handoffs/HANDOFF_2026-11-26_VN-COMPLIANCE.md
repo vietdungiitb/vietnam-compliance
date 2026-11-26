@@ -3,8 +3,9 @@
 - **Ngày:** 26/11/2026
 - **Repo:** `vietdungiitb/vietnam-compliance` — nhánh chính `main`
 - **Trạng thái:** **DONE (pre-production)** — deploy staging PASS, không còn gate chờ người khác
-- **PR đã merge:** #6 (fix P0 + S4 + owner decision), #7 (sửa field GL Entry), #8 (docs verify),
-  #9 nếu có (handoff này). Merge cuối cùng `0733293`.
+- **PR đã merge:** #6 (fix P0 + S4 + owner decision), #7 (field GL Entry), #8 (docs verify),
+  #9 (handoff), #10 (patch migrate custom field + bỏ thuế trùng), #11 (BCTC TT 99 + PIT lũy kế).
+  Merge cuối cùng `b288d36`.
 
 ## 1. Phạm vi đã làm
 
@@ -40,15 +41,25 @@
 4. Worktree `core.bare=true` làm gate `conflict-marker` tự kiểm đỏ — đã phục hồi bằng
    `ops/scripts/fix-worktree-config.mjs --recover` + `git config --worktree core.bare false`.
 
-## 4. Còn lại / next steps (không chặn pre-production)
+## 4. Đã đóng thêm trong phiên tiếp theo
+
+| Việc | Bằng chứng trên staging |
+|---|---|
+| Patch migrate `v0_3` | `Custom Field` module VN **20 bản ghi** (trước = 0); `vn_is_kct` tồn tại |
+| O13 thuế trùng | Salary Structure chỉ còn **1 component `Thuế TNCN`** (`Income Tax` đã bị patch xoá) |
+| Render mẫu in | `frappe.get_print` → HTML 11.664 ký tự, CSS field 2.030 ký tự; cờ KCT hiện đúng, dòng thuế GTGT ẩn |
+| BCTC TT 99 | `VN Bảng Cân Đối Kế Toán` OK 4/8, `VN Báo Cáo Kết Quả Kinh Doanh` OK 4/4 |
+| PIT lũy kế | `calculate_cumulative_withholding([10tr, 30tr])` → `[500k, 4tr]` trên site; hook dùng dữ liệu các slip cùng năm |
+| Site health | 0 lỗi/24h sau mỗi lần migrate |
+
+## 5. Còn lại (không chặn pre-production)
 
 | Việc | Owner |
 |---|---|
-| Render PDF 8 mẫu + đối chiếu endpoint 5 T-VAN với tài liệu vendor | Ops/App khi có hợp đồng T-VAN |
-| Chạy gates ERP-Edusuccess (`no-raw-sql`, `whitelist-methods`, …) nếu copy code sang | Tech lead ERP |
-| O13: hook lương chỉ ghi 3 field, chưa đụng `total_deduction`/`net_pay` | App + ERP (backlog riêng) |
-| TT 58/2026 (DN siêu nhỏ), BCTC TT 99, PIT lũy kế/quyết toán năm | App + KTT tương lai |
-| Bật `VN E Invoice Settings.enabled` khi có hợp đồng T-VAN | Ops |
+| Đối chiếu endpoint 5 T-VAN với tài liệu vendor | Ops/App khi có hợp đồng T-VAN |
+| Chạy gates ERP-Edusuccess nếu copy code sang | Tech lead ERP |
+| TT 58/2026 (DN siêu nhỏ) — chờ bản gốc chính thức để làm CoA | App |
+| Bật `VN E Invoice Settings.enabled` khi có hợp đồng T-VAN (hiện cố tình = 0, fail-closed) | Ops |
 
 *Tài liệu này là bằng chứng theo `documentation-evidence-rule.md`. Không có hạng mục nào
 bị bỏ lại dưới dạng "chờ KTT ký" theo chỉ thị owner 26/11/2026.*
