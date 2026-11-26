@@ -1,25 +1,27 @@
 """Vietnamese Personal Income Tax (PIT / Thuế TNCN) calculator.
 
-Implements the 7-bracket progressive monthly PIT per the current Vietnamese
-tax law, using the "quick deduction" (phương pháp giảm trừ nhanh) method.
+Từ **kỳ tính thuế 2026**, Luật Thuế TNCN 109/2025/QH15 rút gọn từ 7 xuống
+**5 bậc**. Dùng phương pháp giảm trừ nhanh (quick deduction).
 
-Bracket table (monthly taxable income, VND):
+Bảng bậc (thu nhập tính thuế/tháng, VND):
 
-=====  ============  ======  ================
+=====  ============  ======  =================
 Stt    Upper limit   Rate    Quick deduction
-=====  ============  ======  ================
-1      5,000,000      5%     0
-2     10,000,000     10%     250,000
-3     18,000,000     15%     750,000
-4     32,000,000     20%     1,650,000
-5     52,000,000     25%     3,250,000
-6     80,000,000     30%     5,850,000
-7     > 80,000,000   35%     9,850,000
-=====  ============  ======  ================
+=====  ============  ======  =================
+1      10,000,000     5%     0
+2      30,000,000    10%     500,000
+3      60,000,000    20%     3,500,000
+4     100,000,000    30%     9,500,000
+5     > 100,000,000  35%     14,500,000
+=====  ============  ======  =================
+
+Giảm trừ nhanh được suy từ tính liên tục tại các ranh giới:
+10tr×5% = 0,5tr; 30tr×20% − 3,5tr = 2,5tr (= 30tr×10% − 0,5tr); v.v.
 """
 
 from __future__ import annotations
 
+from decimal import Decimal, ROUND_HALF_UP
 from typing import NamedTuple, Optional
 
 
@@ -29,18 +31,16 @@ class PITResult(NamedTuple):
     taxable_income: float  # Thu nhập tính thuế
     tax_amount: float      # Số thuế TNCN
     effective_rate: float  # Thuế suất thực tế (%)
-    bracket: int           # Highest bracket applied (1..7)
+    bracket: int           # Bậc cao nhất áp dụng (1..5 theo Luật 109/2025)
 
 
-#: ``(upper_limit, rate, quick_deduction)`` tuples.
+#: ``(upper_limit, rate, quick_deduction)`` — 5 bậc theo Luật 109/2025/QH15.
 TAX_BRACKETS: list[tuple[float, float, float]] = [
-    (5_000_000,   0.05, 0),
-    (10_000_000,  0.10, 250_000),
-    (18_000_000,  0.15, 750_000),
-    (32_000_000,  0.20, 1_650_000),
-    (52_000_000,  0.25, 3_250_000),
-    (80_000_000,  0.30, 5_850_000),
-    (float("inf"), 0.35, 9_850_000),
+    (10_000_000,   0.05, 0),
+    (30_000_000,   0.10, 500_000),
+    (60_000_000,   0.20, 3_500_000),
+    (100_000_000,  0.30, 9_500_000),
+    (float("inf"), 0.35, 14_500_000),
 ]
 
 
@@ -106,7 +106,13 @@ def calculate_pit(
             bracket = i + 1
             break
 
-    tax_amount = max(0.0, round(tax_amount))
+    # ROUND_HALF_UP theo tập quán kế toán VN (round() của Python là banker's rounding).
+    tax_amount = float(
+        max(
+            Decimal("0"),
+            Decimal(str(tax_amount)).quantize(Decimal("1"), rounding=ROUND_HALF_UP),
+        )
+    )
     effective_rate = (tax_amount / taxable_income * 100) if taxable_income else 0.0
 
     return PITResult(

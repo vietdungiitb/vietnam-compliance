@@ -71,8 +71,13 @@ def test_sets_default_when_format_exists():
         "Purchase Invoice",
         "Quotation",
     ]
+    # Phải cùng filter với hook của smart_edu_core để hội tụ về 1 bản ghi.
     assert any(
-        c[0] == "insert" and c[1]["field_name"] == "default_print_format" for c in calls
+        c[0] == "insert"
+        and c[1]["field_name"] == ""
+        and c[1]["doctype_or_field"] == "DocType"
+        and c[1]["property"] == "default_print_format"
+        for c in calls
     )
 
 

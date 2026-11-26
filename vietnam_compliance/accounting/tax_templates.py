@@ -61,9 +61,19 @@ def create_tax_templates(company: str) -> None:
     if not frappe.db.exists("Account", purchase_tax_account):
         purchase_tax_account = _find_account(company, ["1331", "133"])
 
+    if not sales_tax_account or not purchase_tax_account:
+        # Không tạo template với account_head rỗng — hóa đơn sẽ không phải HĐĐT
+        # đúng quy định và báo cáo thuế lệch. Dừng để kế toán cấu hình CoA.
+        frappe.throw(
+            "Thiếu tài khoản thuế GTGT (33311/1331). Vui lòng nạp hệ thống tài khoản trước."
+        )
+
     for vat in VAT_RATES:
-        sales_name = f"{vat['title']} - {abbr}"
-        if not frappe.db.exists("Sales Taxes and Charges Template", sales_name):
+        # Kiểm theo (title, company) — autoname không đảm bảo "<title> - <abbr>".
+        if not frappe.db.exists(
+            "Sales Taxes and Charges Template",
+            {"title": vat["title"], "company": company},
+        ):
             frappe.get_doc(
                 {
                     "doctype": "Sales Taxes and Charges Template",
@@ -78,10 +88,12 @@ def create_tax_templates(company: str) -> None:
                         }
                     ],
                 }
-            ).insert(ignore_permissions=True)
+            ).insert()
 
-        purchase_name = f"{vat['title']} - {abbr}"
-        if not frappe.db.exists("Purchase Taxes and Charges Template", purchase_name):
+        if not frappe.db.exists(
+            "Purchase Taxes and Charges Template",
+            {"title": vat["title"], "company": company},
+        ):
             frappe.get_doc(
                 {
                     "doctype": "Purchase Taxes and Charges Template",
@@ -96,7 +108,7 @@ def create_tax_templates(company: str) -> None:
                         }
                     ],
                 }
-            ).insert(ignore_permissions=True)
+            ).insert()
 
 
 def _find_account(company: str, account_number_prefixes: list[str]) -> str | None:

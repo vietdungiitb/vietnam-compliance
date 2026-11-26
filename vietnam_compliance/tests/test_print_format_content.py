@@ -20,9 +20,10 @@ class TestTemplateContent(unittest.TestCase):
         self.assertIn("so_tien_bang_chu(doc.rounded_total or doc.grand_total)", html)
 
     def test_hoa_don_kct_flag_dieu_khien_hien_thi(self) -> None:
-        """F-07: KCT note vs VAT row depends on `vn_is_kct` / tax amount."""
+        """KCT note chỉ theo cờ `vn_is_kct`, không suy từ thuế = 0 (OWNER-06)."""
         html = html_of("vn_hoa_don_ban_hang")
-        self.assertIn("doc.vn_is_kct or not doc.total_taxes_and_charges", html)
+        self.assertIn("{% if doc.vn_is_kct %}", html)
+        self.assertNotIn("or not doc.total_taxes_and_charges", html)
         self.assertIn("{% else %}", html)
         self.assertIn("Tiền thuế GTGT:", html)
         self.assertIn("format_vnd(doc.total_taxes_and_charges)", html)

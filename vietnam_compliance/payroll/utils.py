@@ -162,18 +162,22 @@ def validate_salary_slip(doc, method=None) -> None:
     )
     num_dependents = getattr(employee, "vn_number_of_dependents", 0) or 0
 
-    # Resolve wage region from employee province.
-    wage_region = "I"
-    province = getattr(employee, "vn_province", None)
-    if province:
-        region = frappe.db.get_value("VN Province", province, "wage_region")
-        if region:
-            wage_region = region
+    # Vùng lương theo địa bàn hoạt động của NSDLĐ/chi nhánh (NĐ 293/2025),
+    # không theo tỉnh đăng ký của người lao động.
+    wage_region = _resolve_wage_region(doc, employee)
+
+    # Ngày tính lương quyết định mức tham chiếu/trần BHXH (NĐ 161/2026).
+    as_of = getattr(doc, "start_date", None) or getattr(doc, "posting_date", None)
+
+    # KPCĐ tính trên quỹ lương của kỳ, không trên lương cá nhân.
+    total_payroll = _total_payroll_for_period(doc)
 
     from vietnam_compliance.payroll.insurance_calculator import calculate_insurance
     from vietnam_compliance.payroll.pit_calculator import calculate_pit
 
-    insurance = calculate_insurance(insurance_salary, wage_region)
+    insurance = calculate_insurance(
+        insurance_salary, wage_region, total_payroll=total_payroll, as_of=as_of
+    )
     pit = calculate_pit(
         gross_income=doc.gross_pay or 0,
         insurance_deduction=insurance.total_employee,
@@ -183,3 +187,46 @@ def validate_salary_slip(doc, method=None) -> None:
     doc.vn_insurance_employee = insurance.total_employee
     doc.vn_pit_amount = pit.tax_amount
     doc.vn_taxable_income = pit.taxable_income
+
+
+def _resolve_wage_region(doc, employee) -> str:
+    """Chọn vùng lương: địa bàn Company/chi nhánh trước, tỉnh NLĐ chỉ là fallback."""
+    import frappe
+
+    company = getattr(doc, "company", None)
+    if company and frappe.get_meta("Company").has_field("vn_province"):
+        province = frappe.db.get_value("Company", company, "vn_province")
+        if province:
+            region = frappe.db.get_value("VN Province", province, "wage_region")
+            if region:
+                return str(region)
+    employee_province = getattr(employee, "vn_province", None)
+    if employee_province:
+        region = frappe.db.get_value("VN Province", employee_province, "wage_region")
+        if region:
+            return str(region)
+    # Mặc định an toàn: vùng I. Không throw ở đây vì hook validate không được
+    # làm hỏng bảng lương khi thiếu dữ liệu địa bàn — calculator sẽ báo nếu sai.
+    return "I"
+
+
+def _total_payroll_for_period(doc) -> float:
+    """Tổng gross_pay các Salary Slip submitted cùng công ty, cùng kỳ."""
+    import frappe
+
+    company = getattr(doc, "company", None)
+    start_date = getattr(doc, "start_date", None)
+    end_date = getattr(doc, "end_date", None)
+    if not company or not start_date or not end_date:
+        return 0.0
+    slips = frappe.get_all(
+        "Salary Slip",
+        filters={
+            "docstatus": 1,
+            "company": company,
+            "start_date": ("<=", end_date),
+            "end_date": (">=", start_date),
+        },
+        fields=["gross_pay"],
+    )
+    return float(sum((s.gross_pay or 0) for s in slips))

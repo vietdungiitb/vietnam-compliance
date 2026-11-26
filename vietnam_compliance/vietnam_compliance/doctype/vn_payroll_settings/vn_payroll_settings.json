@@ -32,7 +32,7 @@
     ],
     "fields": [
         {"fieldname": "section_base", "fieldtype": "Section Break", "label": "Lương cơ sở & Giảm trừ"},
-        {"fieldname": "base_salary", "fieldtype": "Currency", "label": "Lương cơ sở", "default": "2340000", "description": "Lương cơ sở theo NĐ hiện hành (dùng tính trần BH)"},
+        {"fieldname": "base_salary", "fieldtype": "Currency", "label": "Lương cơ sở", "default": "2530000", "description": "2,53tr từ 01/07/2026 (NĐ 161/2026); 2,34tr trước đó (NĐ 73/2024). Dùng tính sàn/trần BH"},
         {"fieldname": "personal_deduction", "fieldtype": "Currency", "label": "Giảm trừ bản thân", "default": "15500000", "description": "Theo NQ 110/2025/UBTVQH15 — áp dụng từ kỳ tính thuế 2026 (15,5 triệu/tháng = 186 triệu/năm)"},
         {"fieldname": "dependent_deduction", "fieldtype": "Currency", "label": "Giảm trừ người phụ thuộc", "default": "6200000", "description": "Theo NQ 110/2025/UBTVQH15 — áp dụng từ kỳ tính thuế 2026 (6,2 triệu/tháng/NPT)"},
         {"fieldname": "meal_allowance_exempt", "fieldtype": "Currency", "label": "Mức miễn thuế phụ cấp ăn", "default": "730000"},
@@ -54,10 +54,10 @@
         {"fieldname": "ui_ceiling_multiplier", "fieldtype": "Int", "label": "Hệ số trần BHTN", "default": "20", "description": "Trần = Hệ số × Lương tối thiểu vùng"},
 
         {"fieldname": "section_min_wages", "fieldtype": "Section Break", "label": "Vùng lương tối thiểu"},
-        {"fieldname": "min_wage_region_1", "fieldtype": "Currency", "label": "Vùng I", "default": "4960000"},
-        {"fieldname": "min_wage_region_2", "fieldtype": "Currency", "label": "Vùng II", "default": "4410000"},
-        {"fieldname": "min_wage_region_3", "fieldtype": "Currency", "label": "Vùng III", "default": "3860000"},
-        {"fieldname": "min_wage_region_4", "fieldtype": "Currency", "label": "Vùng IV", "default": "3450000"},
+        {"fieldname": "min_wage_region_1", "fieldtype": "Currency", "label": "Vùng I", "default": "5310000", "description": "NĐ 293/2025, từ 01/01/2026"},
+        {"fieldname": "min_wage_region_2", "fieldtype": "Currency", "label": "Vùng II", "default": "4730000", "description": "NĐ 293/2025, từ 01/01/2026"},
+        {"fieldname": "min_wage_region_3", "fieldtype": "Currency", "label": "Vùng III", "default": "4140000", "description": "NĐ 293/2025, từ 01/01/2026"},
+        {"fieldname": "min_wage_region_4", "fieldtype": "Currency", "label": "Vùng IV", "default": "3700000", "description": "NĐ 293/2025, từ 01/01/2026"},
 
         {"fieldname": "section_meta", "fieldtype": "Section Break", "label": "Metadata"},
         {"fieldname": "effective_date", "fieldtype": "Date", "label": "Ngày hiệu lực"}

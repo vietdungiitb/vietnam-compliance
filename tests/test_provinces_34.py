@@ -1,6 +1,5 @@
 import json
 import os
-import pytest
 
 def test_provinces_count_34():
     fixtures_dir = os.path.join(os.path.dirname(__file__), "..", "vietnam_compliance", "fixtures")

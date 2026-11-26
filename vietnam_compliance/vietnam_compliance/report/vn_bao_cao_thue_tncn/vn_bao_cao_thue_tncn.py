@@ -2,11 +2,13 @@
 
 Summarizes monthly PIT per employee for a given date range.
 Used to support form 05/KK-TNCN periodic declarations.
+
+Kỳ được lọc theo **độ phủ giao kỳ** (`start <= to AND end >= from`), không phải
+yêu cầu slip nằm gọn trong kỳ — nếu không, slip giao kỳ bị loại và tờ khai sai.
+Không dùng raw SQL (S1); group trong Python để không phụ thuộc GROUP BY SQL.
 """
 
 from __future__ import annotations
-
-from typing import Any
 
 import frappe
 from frappe import _
@@ -24,46 +26,48 @@ def execute(filters: dict | None = None) -> tuple[list[dict], list[dict]]:
         {"label": _("Thuế TNCN"), "fieldname": "pit", "fieldtype": "Currency", "width": 140},
     ]
 
-    conditions = ["ss.docstatus = 1"]
-    params: dict[str, Any] = {}
-    if filters.get("company"):
-        conditions.append("ss.company = %(company)s")
-        params["company"] = filters["company"]
-    if filters.get("from_date"):
-        conditions.append("ss.start_date >= %(from_date)s")
-        params["from_date"] = filters["from_date"]
-    if filters.get("to_date"):
-        conditions.append("ss.end_date <= %(to_date)s")
-        params["to_date"] = filters["to_date"]
+    company = filters.get("company")
+    if not company:
+        frappe.throw(_("Vui lòng chọn công ty"))
+    from_date = filters.get("from_date")
+    to_date = filters.get("to_date")
+    if not from_date or not to_date:
+        frappe.throw(_("Vui lòng chọn kỳ tính thuế (từ ngày / đến ngày)"))
 
-    where = " AND ".join(conditions)
-    rows = frappe.db.sql(
-        f"""
-        SELECT
-            ss.employee, ss.employee_name,
-            SUM(ss.gross_pay) AS gross_pay,
-            SUM(ss.total_deduction) AS deductions,
-            SUM(ss.vn_taxable_income) AS taxable_income,
-            SUM(ss.vn_pit_amount) AS pit
-        FROM `tabSalary Slip` ss
-        WHERE {where}
-        GROUP BY ss.employee, ss.employee_name
-        ORDER BY ss.employee_name
-        """,
-        params,
-        as_dict=True,
+    doc_filters: dict = {"docstatus": 1, "company": company}
+    if from_date:
+        doc_filters["start_date"] = ("<=", to_date)
+    if to_date:
+        doc_filters["end_date"] = (">=", from_date)
+
+    slips = frappe.get_all(
+        "Salary Slip",
+        filters=doc_filters,
+        fields=[
+            "employee", "employee_name", "gross_pay", "total_deduction",
+            "vn_taxable_income", "vn_pit_amount", "start_date", "end_date",
+        ],
+        order_by="employee_name, start_date",
     )
 
-    data: list[dict] = []
-    for r in rows:
-        tax_code = frappe.db.get_value("Employee", r.employee, "vn_tax_code") or ""
-        data.append({
-            "employee": r.employee,
-            "employee_name": r.employee_name,
-            "tax_code": tax_code,
-            "gross_pay": r.gross_pay or 0,
-            "deductions": r.deductions or 0,
-            "taxable_income": r.taxable_income or 0,
-            "pit": r.pit or 0,
+    grouped: dict[str, dict] = {}
+    for slip in slips:
+        key = slip.employee
+        row = grouped.setdefault(key, {
+            "employee": key,
+            "employee_name": slip.employee_name,
+            "gross_pay": 0.0,
+            "deductions": 0.0,
+            "taxable_income": 0.0,
+            "pit": 0.0,
         })
+        row["gross_pay"] += slip.gross_pay or 0
+        row["deductions"] += slip.total_deduction or 0
+        row["taxable_income"] += slip.vn_taxable_income or 0
+        row["pit"] += slip.vn_pit_amount or 0
+
+    data: list[dict] = []
+    for row in grouped.values():
+        row["tax_code"] = frappe.db.get_value("Employee", row["employee"], "vn_tax_code") or ""
+        data.append(row)
     return columns, data
