@@ -14,6 +14,7 @@
         "invoice_date",
         "lookup_code",
         "transaction_id",
+        "deduplication_id",
         "tax_authority_code",
         "section_invoice_info",
         "section_technical",
@@ -36,6 +37,7 @@
         {"fieldname": "invoice_date", "fieldtype": "Date", "label": "Ngày hóa đơn", "read_only": 1},
         {"fieldname": "lookup_code", "fieldtype": "Data", "label": "Mã tra cứu", "read_only": 1},
         {"fieldname": "transaction_id", "fieldtype": "Data", "label": "Mã giao dịch", "read_only": 1},
+        {"fieldname": "deduplication_id", "fieldtype": "Data", "label": "Khóa chống trùng", "read_only": 1, "unique": 1, "description": "Một giao dịch chỉ phát hành một hóa đơn — AGENTS.md §3.2"},
         {"fieldname": "tax_authority_code", "fieldtype": "Data", "label": "Mã cơ quan thuế", "read_only": 1},
 
         {"fieldname": "section_technical", "fieldtype": "Section Break", "label": "Dữ liệu kỹ thuật", "collapsible": 1},

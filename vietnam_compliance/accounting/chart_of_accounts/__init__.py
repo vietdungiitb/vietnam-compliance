@@ -38,7 +38,7 @@ _CHARTS = {
 _PATCHED = False
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["GET"])
 def get_charts_for_country(country, with_standard=False):
     """Return chart names — includes both ERPNext standard + our VN charts.
 

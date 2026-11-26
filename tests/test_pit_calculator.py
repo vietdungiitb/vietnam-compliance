@@ -33,19 +33,19 @@ class TestCalculatePit:
         assert r.tax_amount == 200_000
         assert r.bracket == 1
 
-    def test_bracket_3(self):
-        # Taxable 15M → 15M * 15% − 750k = 1.5M
+    def test_bracket_2_new_law(self):
+        # Luật 109/2025: taxable 15M → bậc 2 (10%), 15M*10% − 500k = 1,0M
         r = calculate_pit(26_000_000, 0, 0, self.PERSONAL, self.DEPENDENT)
         assert r.taxable_income == 15_000_000
-        assert r.tax_amount == 1_500_000
-        assert r.bracket == 3
+        assert r.tax_amount == 1_000_000
+        assert r.bracket == 2
 
-    def test_bracket_7(self):
-        # Taxable 100M → 100M * 35% − 9.85M = 25.15M
+    def test_bracket_4_new_law(self):
+        # Luật 109/2025: taxable 100M → bậc 4 (30%), 100M*30% − 9,5M = 20,5M
         r = calculate_pit(111_000_000, 0, 0, self.PERSONAL, self.DEPENDENT)
         assert r.taxable_income == 100_000_000
-        assert r.tax_amount == 25_150_000
-        assert r.bracket == 7
+        assert r.tax_amount == 20_500_000
+        assert r.bracket == 4
 
     def test_dependents_reduce_tax(self):
         without = self._pit(30_000_000, 0, 0)

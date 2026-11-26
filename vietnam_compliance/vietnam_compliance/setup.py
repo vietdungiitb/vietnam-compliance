@@ -34,14 +34,15 @@ def after_install() -> None:
     )
 
     set_default_print_formats()
-    frappe.db.commit()
+    # Không gọi frappe.db.commit(): Frappe quản lý transaction theo request
+    # (S2 của ERP-Edusuccess). Commit tay phá rollback khi setup lỗi giữa chừng.
     print("✅ Vietnam Compliance: Installation complete")
 
 
 def before_uninstall() -> None:
     """Cleanup before uninstall."""
     delete_custom_fields()
-    frappe.db.commit()
+    # Không commit tay — xem lý do trong after_install().
 
 
 # ---------------------------------------------------------------------------
@@ -94,17 +95,18 @@ def setup_company_vietnam(args: dict) -> None:
         },
     )
 
-    # Create VAT tax templates (0% / 5% / 8% / 10%)
-    try:
-        create_tax_templates(company)
-    except Exception as exc:
-        frappe.log_error(f"create_tax_templates failed for {company}: {exc}")
+    # Create VAT tax templates (0% / 5% / 8% / 10%).
+    # Không nuốt exception: thiếu template thuế là lỗi cấu hình, phải dừng setup
+    # để kế toán xử lý thay vì âm thầm chạy tiếp với Company không có template thuế.
+    create_tax_templates(company)
 
-    # System-wide Vietnam defaults
+    # System-wide Vietnam defaults.
+    # CỐ TÌNH KHÔNG đặt `number_format` / `currency_precision`: ép precision = 0
+    # làm tròn MỌI phép tính kế toán (30.000/7 → 4.286 → ×7 = 30.002).
+    # Giữ cấu hình gốc của ERPNext; làm tròn ở cấp chứng từ
+    # (`rounding_adjustment` / `rounded_total`). Xem bài học 31 của ERP-Edusuccess.
     frappe.db.set_single_value("System Settings", "date_format", "dd/mm/yyyy")
     frappe.db.set_single_value("System Settings", "time_format", "HH:mm:ss")
-    frappe.db.set_single_value("System Settings", "number_format", "#.###")
-    frappe.db.set_single_value("System Settings", "currency_precision", "0")
     frappe.db.set_single_value("System Settings", "language", "vi")
 
 
@@ -114,7 +116,7 @@ def setup_company_vietnam(args: dict) -> None:
 
 
 def load_provinces() -> None:
-    """Load 63 Vietnamese provinces/cities into VN Province DocType."""
+    """Load 34 Vietnamese provinces/cities (NQ 202/2025/QH15) into VN Province."""
     fixture_path = os.path.join(
         os.path.dirname(__file__), "..", "fixtures", "provinces.json"
     )

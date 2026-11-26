@@ -62,7 +62,10 @@ def on_sales_invoice_submit(doc, method=None) -> None:
 
     try:
         provider = get_provider()
-        provider.create_and_send(doc.name)
+        # Mỗi Sales Invoice chỉ phát hành 1 lần dù hook chạy lại / bấm lại nút.
+        provider.create_and_send(
+            doc.name, deduplication_id=f"{doc.name}:{settings.provider}"
+        )
         frappe.msgprint(_("Đã phát hành hóa đơn điện tử thành công"), indicator="green")
     except EInvoiceError as exc:
         frappe.log_error(title=f"E-Invoice send error for {doc.name}", message=str(exc))
@@ -88,7 +91,7 @@ def poll_pending_invoices() -> None:
     pending = frappe.get_all(
         "VN E Invoice Log",
         filters={"status": "Pending"},
-        fields=["name", "transaction_id", "sales_invoice"],
+        fields=["name", "transaction_id", "sales_invoice", "invoice_number"],
         limit=50,
     )
     if not pending:
@@ -110,9 +113,24 @@ def poll_pending_invoices() -> None:
             continue
 
         if result["status"] == "accepted":
-            frappe.db.set_value("VN E Invoice Log", log.name, "status", "Accepted")
+            # `get_status` chỉ trả {status, message} — KHÔNG có số hóa đơn.
+            # Không được gán "Đã phát hành" cho SI khi chưa có số (O10).
+            invoice_number = result.get("invoice_number") or log.get("invoice_number")
+            if not invoice_number:
+                frappe.log_error(
+                    title=f"E-Invoice poll {log.name}: accepted nhưng thiếu số HĐ",
+                    message="Giữ trạng thái Pending cho tới khi có số hóa đơn từ T-VAN",
+                )
+                continue
             frappe.db.set_value(
-                "Sales Invoice", log.sales_invoice, "vn_einvoice_status", "Đã phát hành"
+                "VN E Invoice Log",
+                log.name,
+                {"status": "Accepted", "invoice_number": invoice_number},
+            )
+            frappe.db.set_value(
+                "Sales Invoice",
+                log.sales_invoice,
+                {"vn_einvoice_status": "Đã phát hành", "vn_einvoice_number": invoice_number},
             )
         elif result["status"] == "rejected":
             frappe.db.set_value("VN E Invoice Log", log.name, "status", "Rejected")
@@ -123,7 +141,7 @@ def poll_pending_invoices() -> None:
 # ---------------------------------------------------------------------------
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def send_einvoice(sales_invoice: str) -> dict:
     """Publish the e-invoice for a given Sales Invoice.
 
@@ -132,12 +150,15 @@ def send_einvoice(sales_invoice: str) -> dict:
     if not frappe.has_permission("Sales Invoice", "write", doc=sales_invoice):
         frappe.throw(_("Bạn không có quyền phát hành hóa đơn này"))
 
+    settings = frappe.get_single("VN E Invoice Settings")
     provider = get_provider()
-    result = provider.create_and_send(sales_invoice)
+    result = provider.create_and_send(
+        sales_invoice, deduplication_id=f"{sales_invoice}:{settings.provider}"
+    )
     return result
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def cancel_einvoice(sales_invoice: str, reason: str) -> dict:
     """Cancel the published e-invoice for a Sales Invoice."""
     if not frappe.has_permission("Sales Invoice", "write", doc=sales_invoice):
@@ -152,6 +173,10 @@ def cancel_einvoice(sales_invoice: str, reason: str) -> dict:
     provider = get_provider()
     result = provider.cancel(invoice_number, reason)
 
+    # HTTP 200 chưa chắc là hủy thành công: chỉ ghi "Đã hủy" khi provider xác nhận.
+    if str(result.get("status", "")).lower() not in {"cancelled", "canceled", "huy"}:
+        frappe.throw(_("T-VAN chưa xác nhận hủy hóa đơn — trạng thái không đổi"))
+
     frappe.db.set_value("Sales Invoice", sales_invoice, "vn_einvoice_status", "Đã hủy")
     frappe.get_doc(
         {
@@ -163,4 +188,7 @@ def cancel_einvoice(sales_invoice: str, reason: str) -> dict:
             "error_message": reason,
         }
     ).insert(ignore_permissions=True)
+    # S4: endpoint đã kiểm has_permission("Sales Invoice","write") ở trên;
+    # API key riêng: CHƯA CHẠY (Ops cấp service account — PLAN R-OPS);
+    # audit log = Version/Error Log trên site.
     return result

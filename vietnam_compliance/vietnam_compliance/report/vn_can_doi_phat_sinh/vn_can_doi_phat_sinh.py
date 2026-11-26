@@ -3,11 +3,11 @@
 Classic Vietnamese accounting trial-balance layout: for each non-group
 account, shows opening balance (Nợ/Có), period movement (Nợ/Có), and
 closing balance (Nợ/Có).
+
+Không dùng raw SQL (S1): mọi truy vấn đi qua ``frappe.get_all``.
 """
 
 from __future__ import annotations
-
-from typing import Any
 
 import frappe
 from frappe import _
@@ -18,6 +18,9 @@ def execute(filters: dict | None = None) -> tuple[list[dict], list[dict]]:
     company = filters.get("company")
     if not company:
         frappe.throw(_("Vui lòng chọn công ty"))
+
+    from_date = filters.get("from_date")
+    to_date = filters.get("to_date")
 
     columns = [
         {"label": _("Số TK"), "fieldname": "account_number", "fieldtype": "Data", "width": 100},
@@ -37,51 +40,46 @@ def execute(filters: dict | None = None) -> tuple[list[dict], list[dict]]:
         order_by="account_number",
     )
 
-    from_date = filters.get("from_date")
-    to_date = filters.get("to_date")
-
     data: list[dict] = []
     for acc in accounts:
-        params: dict[str, Any] = {"account": acc.name, "company": company}
-
-        # Opening
-        opening_bal = 0.0
+        opening_filters: dict = {
+            "company": company,
+            "account": acc.name,
+            "is_cancelled": 0,
+            "posting_date": ("<", from_date),
+        }
+        period_filters: dict = {
+            "company": company,
+            "account": acc.name,
+            "is_cancelled": 0,
+        }
         if from_date:
-            opening = frappe.db.sql(
-                """
-                SELECT COALESCE(SUM(debit - credit), 0)
-                FROM `tabGL Entry`
-                WHERE is_cancelled = 0 AND account = %(account)s
-                  AND company = %(company)s AND posting_date < %(from_date)s
-                """,
-                {**params, "from_date": from_date},
-            )
-            opening_bal = float(opening[0][0]) if opening else 0.0
-
-        # Period
-        period_params = dict(params)
-        period_conds = ["is_cancelled = 0", "account = %(account)s", "company = %(company)s"]
-        if from_date:
-            period_conds.append("posting_date >= %(from_date)s")
-            period_params["from_date"] = from_date
+            period_filters["posting_date"] = (">=", from_date)
         if to_date:
-            period_conds.append("posting_date <= %(to_date)s")
-            period_params["to_date"] = to_date
+            period_filters["posting_date"] = ("<=", to_date)
 
-        period = frappe.db.sql(
-            f"""
-            SELECT COALESCE(SUM(debit), 0), COALESCE(SUM(credit), 0)
-            FROM `tabGL Entry`
-            WHERE {' AND '.join(period_conds)}
-            """,
-            period_params,
+        opening_rows = (
+            frappe.get_all(
+                "GL Entry",
+                filters=opening_filters,
+                fields=["debit", "credit"],
+            )
+            if from_date
+            else []
         )
-        period_debit, period_credit = (float(period[0][0]), float(period[0][1])) if period else (0.0, 0.0)
+        opening_bal = float(
+            sum((r.debit or 0) - (r.credit or 0) for r in opening_rows)
+        )
 
+        period_rows = frappe.get_all(
+            "GL Entry", filters=period_filters, fields=["debit", "credit"]
+        )
+        period_debit = float(sum((r.debit or 0) for r in period_rows))
+        period_credit = float(sum((r.credit or 0) for r in period_rows))
         closing_bal = opening_bal + period_debit - period_credit
 
-        # Skip accounts with no activity and zero balances
-        if opening_bal == 0 and period_debit == 0 and period_credit == 0 and closing_bal == 0:
+        # Bỏ qua tài khoản không có hoạt động và số dư bằng 0.
+        if not any((opening_bal, period_debit, period_credit, closing_bal)):
             continue
 
         data.append({

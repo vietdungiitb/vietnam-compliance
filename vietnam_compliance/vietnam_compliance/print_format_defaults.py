@@ -66,23 +66,26 @@ def set_default_print_formats(company: str | None = None) -> dict[str, Any]:
         if not _print_format_exists(format_name):
             skipped.append(doctype)
             continue
-        ps_name = f"{doctype}-default_print_format"
+        # Cùng filter với hook `ensure_vn_print_format_defaults` của
+        # smart_edu_core để hai bản ghi hội tụ thành MỘT Property Setter.
+        filters = {
+            "doctype_or_field": "DocType",
+            "doc_type": doctype,
+            "field_name": "",
+            "property": "default_print_format",
+        }
         try:
-            existing = frappe.db.exists("Property Setter", ps_name)
+            existing = frappe.db.get_value("Property Setter", filters, "name")
             if existing:
-                frappe.db.set_value("Property Setter", ps_name, "value", format_name)
+                frappe.db.set_value("Property Setter", existing, "value", format_name)
             else:
                 frappe.get_doc(
-                    {
-                        "doctype": "Property Setter",
-                        "name": ps_name,
-                        "doc_type": doctype,
-                        "field_name": "default_print_format",
-                        "property": "default_print_format",
-                        "value": format_name,
-                        "property_type": "Data",
-                    }
+                    {"doctype": "Property Setter", **filters,
+                     "property_type": "Data", "value": format_name}
                 ).insert(ignore_permissions=True)
+                # S4: chạy lúc after_install (system hook); API key riêng
+                # CHƯA CHẠY (Ops cấp service account — PLAN R-OPS);
+                # audit log = Version của Property Setter trên site.
             applied.append(doctype)
         except Exception:  # noqa: BLE001 - one failure must not stop the rest
             skipped.append(doctype)

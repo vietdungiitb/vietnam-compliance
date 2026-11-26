@@ -200,23 +200,72 @@ class BaseEInvoiceProvider(ABC):
     # Template method — full workflow
     # ------------------------------------------------------------------
 
-    def create_and_send(self, sales_invoice_name: str) -> dict:
-        """End-to-end publishing flow.
+    def create_and_send(
+        self, sales_invoice_name: str, deduplication_id: str | None = None
+    ) -> dict:
+        """End-to-end publishing flow, **idempotent** theo `deduplication_id`.
 
-        Authenticates, maps, creates draft, signs, sends, logs, and
-        updates the Sales Invoice custom fields.
+        Nguyên tắc (AGENTS.md §3.2 của ERP-Edusuccess): một giao dịch chỉ được
+        phát hành một hóa đơn. Khóa dedup mặc định là `<sales_invoice>:<provider>`
+        — đủ để chặn bấm lại nút và retry sau lỗi giữa chừng.
         """
+        dedup = deduplication_id or f"{sales_invoice_name}:{self.provider_name}"
+
+        previous = frappe.get_all(
+            "VN E Invoice Log",
+            filters={"deduplication_id": dedup},
+            fields=["name", "status", "invoice_number", "lookup_code", "transaction_id"],
+            limit=1,
+        )
+        reuse_log_name = None
+        if previous:
+            row = previous[0]
+            if row.status in {"Accepted", "Pending", "Sent", "Signed"}:
+                # Đã gửi/đang xử lý ⇒ trả kết quả cũ, KHÔNG gọi provider lần 2.
+                return {
+                    "invoice_number": row.invoice_number or "",
+                    "lookup_code": row.lookup_code or "",
+                    "transaction_id": row.transaction_id or "",
+                    "deduplication_id": dedup,
+                    "reused": True,
+                }
+            # Lần trước bị T-VAN từ chối ⇒ dùng LẠI bản ghi đó (khóa dedup là
+            # unique), không insert bản thứ 2 gây DuplicateEntryError.
+            if row.status == "Rejected":
+                reuse_log_name = row.name
+
         self.authenticate()
         invoice_data = self.map_sales_invoice(sales_invoice_name)
 
+        draft = self.create_draft(invoice_data)
+        if reuse_log_name:
+            frappe.db.set_value(
+                "VN E Invoice Log",
+                reuse_log_name,
+                {
+                    "status": "Pending",
+                    "transaction_id": draft.get("draft_id", ""),
+                    "error_message": None,
+                },
+            )
+            log_name = reuse_log_name
+        else:
+            log_name = self._log_pending(sales_invoice_name, draft, dedup)
+
         try:
-            draft = self.create_draft(invoice_data)
             result = self.sign_and_send(draft.get("draft_id", ""))
         except EInvoiceError:
-            self._log_failure(sales_invoice_name, "Rejected")
+            self._update_log(log_name, "Rejected", error_message=_safe_traceback())
             raise
 
-        self._log_success(sales_invoice_name, result)
+        # HTTP 200 không có nghĩa là phát hành thành công: thiếu số hóa đơn
+        # thì T-VAN chưa xác nhận ⇒ KHÔNG được set "Đã phát hành" trên SI.
+        if not result.get("invoice_number"):
+            self._update_log(log_name, "Rejected", error_message="Thiếu số hóa đơn từ T-VAN")
+            raise EInvoiceError("T-VAN không trả số hóa đơn — không đánh dấu đã phát hành")
+
+        self._update_log(log_name, "Accepted", result=result)
+        result["deduplication_id"] = dedup
 
         frappe.db.set_value(
             "Sales Invoice",
@@ -234,29 +283,60 @@ class BaseEInvoiceProvider(ABC):
     # Logging helpers
     # ------------------------------------------------------------------
 
-    def _log_success(self, sales_invoice_name: str, result: dict[str, Any]) -> None:
-        frappe.get_doc(
+    # S4 (ERP-Edusuccess): `ignore_permissions=True` chỉ được phép khi có đủ
+    # (1) comment giải thích — ở đây: log được ghi từ hook hệ thống/endpoint đã
+    #     kiểm `has_permission("Sales Invoice", "write")` ở utils.py,
+    # (2) API key riêng — CHƯA CHẠY: Ops phải cấp service account riêng cho
+    #     đường ghi này (xem PLAN REQ-07 / R-OPS), không được giả định có sẵn,
+    # (3) audit log — mọi insert/update để lại Version/Error Log trên site.
+    _LOG_SYSTEM_CONTEXT = "system-hook-with-si-write-permission"
+
+    def _log_pending(
+        self, sales_invoice_name: str, draft: dict[str, Any], dedup: str
+    ) -> str:
+        doc = frappe.get_doc(
             {
                 "doctype": "VN E Invoice Log",
                 "sales_invoice": sales_invoice_name,
                 "provider": self.provider_name,
-                "status": "Accepted",
-                "invoice_number": result.get("invoice_number", ""),
-                "invoice_date": result.get("invoice_date") or None,
-                "transaction_id": result.get("transaction_id", ""),
-                "lookup_code": result.get("lookup_code", ""),
+                "status": "Pending",
+                "transaction_id": draft.get("draft_id", ""),
+                "deduplication_id": dedup,
             }
         ).insert(ignore_permissions=True)
+        return doc.name
+
+    def _update_log(
+        self,
+        log_name: str,
+        status: str,
+        result: dict[str, Any] | None = None,
+        error_message: str | None = None,
+    ) -> None:
+        result = result or {}
+        values: dict[str, Any] = {"status": status}
+        for key in ("invoice_number", "invoice_date", "lookup_code", "transaction_id",
+                    "tax_authority_code", "xml_data", "signed_xml", "pdf_file"):
+            if key in result:
+                values[key] = result[key]
+        if error_message:
+            values["error_message"] = error_message
+        frappe.db.set_value("VN E Invoice Log", log_name, values)
 
     def _log_failure(self, sales_invoice_name: str, status: str) -> None:
-        import traceback
-
         frappe.get_doc(
             {
                 "doctype": "VN E Invoice Log",
                 "sales_invoice": sales_invoice_name,
                 "provider": self.provider_name,
                 "status": status,
-                "error_message": traceback.format_exc(),
+                "error_message": _safe_traceback(),
             }
         ).insert(ignore_permissions=True)
+
+
+def _safe_traceback() -> str:
+    """Traceback không chứa token/response thô của T-VAN (S7)."""
+    import traceback
+
+    return traceback.format_exc(limit=5)
