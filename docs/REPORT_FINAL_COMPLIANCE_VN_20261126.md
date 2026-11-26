@@ -41,14 +41,16 @@ Diff: **20 file modified (+570 / −304)** + 5 file mới (`tests/test_complianc
 
 ## 4. Reservation / CHƯA CHẠY
 
-1. **Ops:** `bench migrate` trên VPS staging (khoá `ENV-STAGING`), đếm log cũ before-add unique field.
+1. **Ops — ĐÃ CHẠY:** `bench migrate` trên VPS staging PASS (claim `ENV-STAGING` đã đóng,
+   0 log cũ trước khi thêm unique field). Deploy 10/10 PASS, rebuild `--no-cache`.
 2. **S4 đã đóng:** bỏ hoàn toàn `ignore_permissions=True`, cấp `create/write` cho
    `Accounts User`/`Accounts Manager` trên `VN E Invoice Log`. Không còn chờ service account.
 3. **Owner đã tự phê duyệt** mọi mục thuế/BHXH/KCT cho pre-production
    (`docs/OWNER-DECISION-20261126.md`). Không chờ KTT — khi có KTT ở production họ sẽ
    yêu cầu thay đổi nếu cần.
-4. **CHƯA XÁC MINH:** `against_account` trong `GL Entry` (không có source ERPNext trong repo);
-   render PDF 8 mẫu; 5 provider T-VAN; gates ERP — sẽ kiểm trên staging.
+4. **Đã kiểm trên staging:** field GL Entry là `against` (KHÔNG phải `against_account`) —
+   report đã sửa ở PR #7; 4 report chạy OK; `deduplication_id` có thật; PIT/BHXH đúng luật;
+   Property Setter hội tụ; site health 0 lỗi. Deploy 10/10 PASS + rebuild `--no-cache`.
 5. **Backlog riêng:** O13 (hook lương chỉ ghi 3 field, không đụng `total_deduction`/`net_pay`),
    TT 58/2026, cumulative PIT/quyết toán năm, BCTC theo TT 99, gỡ hook print-format trùng ở ERP.
 

@@ -20,9 +20,9 @@ Auditor độc lập tự chạy lại và cho **AGREE**, không blocker/major.
 
 ## Chưa xong (không báo PASS)
 
-`bench migrate` staging · xác minh `against_account`, render PDF, 5 T-VAN, gates ERP ·
-backlog O13/TT58/BCTC/PIT lũy kế. S4 đã đóng bằng RBAC thật; thuế/BHXH/KCT đã owner
-phê duyệt, không chờ KTT.
+Render PDF, 5 T-VAN, gates ERP · backlog O13/TT58/BCTC/PIT lũy kế.
+S4 đã đóng bằng RBAC thật; thuế/BHXH/KCT đã owner phê duyệt, không chờ KTT.
+Staging: deploy 10/10 PASS, migrate PASS, 4 report OK, site health 0 lỗi — **đã chạy**.
 
 ## File chính
 

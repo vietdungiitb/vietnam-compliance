@@ -284,10 +284,21 @@ Auditor độc lập re-audit vòng 2: **AGREE** — 0 blocker, 0 major. Các ob
 JSON validation → OK; kiểm 25 file sửa → 0 ký tự `U+FFFD`.
 Fail-before gốc: 26 failed / 2 passed trước khi sửa (`tests/test_compliance_2026.py`).
 
-**CHƯA CHẠY / CHƯA XÁC MINH (chuyển tiếp, không báo PASS):**
-- `bench migrate` VPS staging cho field `deduplication_id` unique (khoá `ENV-STAGING`, đếm log cũ).
-- `against_account` trong GL Entry; hội tụ Property Setter; render PDF 8 mẫu; 5 provider T-VAN;
-  gates ERP-Edusuccess; O13 (hai nguồn tính lương) — backlog riêng.
+**Đã kiểm chứng trên VPS staging (26/11/2026):**
+
+| Hạng mục | Kết quả đo được |
+|---|---|
+| Deploy + migrate | `deploy-staging.sh` **10/10 PASS**, SHA `27475edc`; rebuild `--no-cache` để lấy app `df2f927` (Docker layer cache đã giữ bản cũ ở lần đầu) |
+| PIT kỳ 2026 | `calculate_pit(20tr)` → **1.500.000đ, bậc 2** (`bench console`) |
+| BHXH effective-date | 30/06/2026 → **3.744.000đ**; 01/07/2026 → **4.048.000đ** |
+| Schema `deduplication_id` | `frappe.get_meta("VN E Invoice Log")` → **True** (0 log cũ ⇒ unique index an toàn) |
+| 4 báo cáo | TrialBalance 8/8, GeneralLedger 8/1, InvoiceRegister 10/2, PITReport 7/0 — đều `OK` |
+| Property Setter default | 2 bản ghi `Sales Invoice`/`Payment Entry`, `doctype_or_field="DocType"`, `field_name=""` — hội tụ |
+| Tiền VND | `currency_precision` = None (baseline gốc), site health **0 lỗi/24h** |
+| `against_account` | Đo thật: GL Entry **có `against`, KHÔNG có `against_account`** ⇒ đã sửa report sang `against` ở PR #7 (lỗi do bản sửa đầu gây ra, đã đóng) |
+
+**Còn lại (backlog, không chặn pre-production):** render PDF 8 mẫu, đối chiếu endpoint 5 T-VAN,
+gates ERP-Edusuccess, O13 (hai nguồn tính lương), TT 58/2026, BCTC TT 99, PIT lũy kế.
 
 ## 12. Quyết định cuối của owner — pre-production (26/11/2026)
 
