@@ -173,20 +173,70 @@ def validate_salary_slip(doc, method=None) -> None:
     total_payroll = _total_payroll_for_period(doc)
 
     from vietnam_compliance.payroll.insurance_calculator import calculate_insurance
-    from vietnam_compliance.payroll.pit_calculator import calculate_pit
+    from vietnam_compliance.payroll.pit_calculator import (
+        calculate_cumulative_withholding,
+        calculate_pit,
+    )
 
     insurance = calculate_insurance(
         insurance_salary, wage_region, total_payroll=total_payroll, as_of=as_of
     )
-    pit = calculate_pit(
-        gross_income=doc.gross_pay or 0,
-        insurance_deduction=insurance.total_employee,
-        num_dependents=num_dependents,
-    )
+    taxable_base = (doc.gross_pay or 0) - insurance.total_employee
+
+    prior_bases = _prior_year_taxable_bases(doc)
+    if prior_bases is None:
+        # Không có dữ liệu kỳ trước ⇒ fallback tính tháng (fail-safe).
+        pit = calculate_pit(
+            gross_income=doc.gross_pay or 0,
+            insurance_deduction=insurance.total_employee,
+            num_dependents=num_dependents,
+        )
+        tax_amount, taxable_income = pit.tax_amount, pit.taxable_income
+    else:
+        tax_amount = calculate_cumulative_withholding(
+            prior_bases + [taxable_base], num_dependents=num_dependents
+        )[-1]
+        taxable_income = taxable_base
 
     doc.vn_insurance_employee = insurance.total_employee
-    doc.vn_pit_amount = pit.tax_amount
-    doc.vn_taxable_income = pit.taxable_income
+    doc.vn_pit_amount = tax_amount
+    doc.vn_taxable_income = taxable_income
+
+
+def _prior_year_taxable_bases(doc) -> list[float] | None:
+    """Cơ sở thu nhập tính thuế (đã trừ BH) của các tháng trước trong cùng năm.
+
+    Trả ``None`` khi không thể đọc (không có site / lỗi schema) để hook không làm
+    hỏng bảng lương.
+    """
+    import frappe
+
+    start_date = getattr(doc, "start_date", None)
+    company = getattr(doc, "company", None)
+    employee = getattr(doc, "employee", None)
+    if not (start_date and company and employee):
+        return None
+    year = str(start_date)[:4]
+    try:
+        slips = frappe.get_all(
+            "Salary Slip",
+            filters={
+                "docstatus": 1,
+                "employee": employee,
+                "company": company,
+                "start_date": (">=", f"{year}-01-01"),
+                "end_date": ("<=", f"{year}-12-31"),
+                "name": ("!=", doc.name),
+            },
+            fields=["gross_pay", "vn_insurance_employee", "start_date"],
+            order_by="start_date",
+        )
+    except Exception:
+        return None
+    return [
+        float((s.gross_pay or 0) - (s.vn_insurance_employee or 0))
+        for s in slips
+    ]
 
 
 def _resolve_wage_region(doc, employee) -> str:
