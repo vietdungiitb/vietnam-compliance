@@ -5,7 +5,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="vietnam_compliance",
-    version="0.2.0",
+    version="0.3.0",
     description="Vietnam Statutory Compliance & Localization for Frappe / ERPNext v16 (TT 200/133, NQ 202/2025/QH15 34 Tỉnh thành, Thuế GTGT/TNCN, Hóa đơn điện tử T-VAN 02GTTT/01GTKT)",
     author="Edusuccess & Open Source Contributors",
     author_email="tech@edusuccess.vn",

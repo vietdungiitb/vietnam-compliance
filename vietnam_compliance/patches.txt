@@ -1,1 +1,2 @@
 vietnam_compliance.patches.v0_2.cleanup_legacy_provinces
+vietnam_compliance.patches.v0_3.ensure_vn_setup
