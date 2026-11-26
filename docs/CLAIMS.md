@@ -14,3 +14,5 @@
 - [done] COMPLIANCE-VN-20261126 | fix/compliance-vn-20261126 | 2026-11-26 | re-audit AGREE; pytest 25267 passed; ruff clean; transaction R-OPS/KTT/migrate chuyen tiep
 - [in-progress] ENV-STAGING | fix/compliance-vn-20261126 | 2026-11-26 | khoa-moi-truong-dung-chung: bench migrate + smoke test tren VPS staging erp.edusuccess.vn (book ~30p)
 - [done] ENV-STAGING | fix/compliance-vn-20261126 | 2026-11-26 | deploy 10/10 PASS, rebuild no-cache, migrate PASS, 4 report OK, site health 0 loi; claim dong
+- [in-progress] ENV-STAGING | fix/compliance-vn-20261126 | 2026-11-26 | wave 2: patch v0_3 + BCTC TT99 + PIT luy ke, rebuild/migrate/verify
+- [done] ENV-STAGING | fix/compliance-vn-20261126 | 2026-11-26 | wave 2 done: 20 custom field, dedupe PIT, BS/PL OK, render KCT OK, health 0; claim dong

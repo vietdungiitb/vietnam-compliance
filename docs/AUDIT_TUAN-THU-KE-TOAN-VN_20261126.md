@@ -297,8 +297,13 @@ Fail-before gốc: 26 failed / 2 passed trước khi sửa (`tests/test_complian
 | Tiền VND | `currency_precision` = None (baseline gốc), site health **0 lỗi/24h** |
 | `against_account` | Đo thật: GL Entry **có `against`, KHÔNG có `against_account`** ⇒ đã sửa report sang `against` ở PR #7 (lỗi do bản sửa đầu gây ra, đã đóng) |
 
-**Còn lại (backlog, không chặn pre-production):** render PDF 8 mẫu, đối chiếu endpoint 5 T-VAN,
-gates ERP-Edusuccess, O13 (hai nguồn tính lương), TT 58/2026, BCTC TT 99, PIT lũy kế.
+**Đã đóng thêm (PR #10/#11):** patch migrate tạo 20 custom field (trước = 0), bỏ component
+`Income Tax` trùng (chỉ còn `Thuế TNCN`), render `frappe.get_print` OK (CSS 2.030 ký tự, KCT đúng),
+2 BCTC TT 99 chạy OK (BS 4/8, P&L 4/4), PIT lũy kế `[500k, 4tr]` trên site, health 0 lỗi.
+
+**Còn lại (backlog, không chặn pre-production):** đối chiếu endpoint 5 T-VAN khi có hợp đồng,
+gates ERP nếu copy code sang, CoA TT 58/2026 (chờ bản gốc). `enabled` của HĐĐT cố tình = 0
+(fail-closed) tới khi có T-VAN.
 
 ## 12. Quyết định cuối của owner — pre-production (26/11/2026)
 
