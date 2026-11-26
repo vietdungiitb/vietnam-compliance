@@ -30,6 +30,10 @@ Xử lý 6 finding P0 + các P1/P2 liên quan trực tiếp đến chuẩn mực
             python -m compileall -q vietnam_compliance/ tests/    → exit 0
             JSON validate                                          → OK
             encoding: 25 file sửa, 0 ký tự U+FFFD
+
+CI lần đầu lint đỏ do ruff trên runner dùng bộ rule lệch (41 lỗi, phần lớn là code legacy
+như `F403` shim, `N999` tên thư mục UTF-8). Đã thêm `ruff.toml` khai rõ bộ rule mặc định
+`E4/E7/E9 + F` — local và CI cùng một bộ, `ruff check` xanh.
 ```
 
 Diff: **20 file modified (+570 / −304)** + 5 file mới (`tests/test_compliance_2026.py`,
