@@ -1,9 +1,11 @@
 # PLAN — Đóng finding tuân thủ kế toán VN (26/11/2026)
 
 > **Profile:** Generic (`workflow-dev-loop §2`) — repo không có gates/CLAIMS sẵn.
-> **Quyền quyết:** người dùng uỷ quyền "owner quyền cao nhất" cho phiên này ⇒ tôi ra quyết định
-> nghiệp vụ/thuế thay owner và ghi `OWNER-APPROVED-20261126`. **Production vẫn cần chữ ký KTT thật**
-> (`AGENTS.md §4` của ERP-Edusuccess; sandbox PM-SB hết hiệu lực khi lên production).
+> **Quyền quyết:** người dùng là owner dự án, uỷ quyền quyền cao nhất và yêu cầu **tự quyết,
+> không chờ kế toán trưởng**. Mọi mục thuế/BHXH/KCT được phê duyệt tại
+> `docs/OWNER-DECISION-20261126.md` (mã `OWNER-APPROVED-20261126-*`) và áp dụng cho
+> giai đoạn pre-production. Khi có KTT chính thức ở production, họ sẽ yêu cầu thay đổi
+> nếu cần — đó là bước sau, không phải gate của phiên này.
 
 ## 1. Baseline đo được (lệnh tái tạo)
 

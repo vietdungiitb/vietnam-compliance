@@ -153,8 +153,13 @@ class TestEInvoiceIdempotency:
         raw = (APP / "vietnam_compliance/doctype/vn_e_invoice_log/vn_e_invoice_log.json").read_text(
             encoding="utf-8"
         )
-        fields = {f["fieldname"] for f in json.loads(raw)["fields"]}
+        data = json.loads(raw)
+        fields = {f["fieldname"] for f in data["fields"]}
         assert "deduplication_id" in fields
+        # S4: thay vì bypass RBAC, cấp quyền tường minh cho role nghiệp vụ.
+        accounts = [p for p in data["permissions"] if p["role"] == "Accounts User"]
+        assert accounts and accounts[0].get("create") == 1
+        assert accounts[0].get("write") == 1
 
     def test_dispatchers_are_post_only(self):
         src = _read("e_invoicing/utils.py")
@@ -182,8 +187,11 @@ class TestSafetyRulesS1S2S4S5:
         ]
         assert executing_lines == []
 
-    def test_no_bare_ignore_permissions_in_tax_templates(self):
-        assert "ignore_permissions=True" not in _read("accounting/tax_templates.py")
+    def test_no_permission_bypass_anywhere(self):
+        """S4: RBAC không bị bypass — quyền được cấp trong DocType JSON."""
+        for path in APP.rglob("*.py"):
+            src = path.read_text(encoding="utf-8")
+            assert "ignore_permissions=True" not in src, path.name
 
     def test_no_whitelist_without_methods(self):
         for path in APP.rglob("*.py"):

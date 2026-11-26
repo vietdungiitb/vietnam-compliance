@@ -187,8 +187,7 @@ def cancel_einvoice(sales_invoice: str, reason: str) -> dict:
             "invoice_number": invoice_number,
             "error_message": reason,
         }
-    ).insert(ignore_permissions=True)
-    # S4: endpoint đã kiểm has_permission("Sales Invoice","write") ở trên;
-    # API key riêng: CHƯA CHẠY (Ops cấp service account — PLAN R-OPS);
-    # audit log = Version/Error Log trên site.
+    ).insert()
+    # S4: endpoint đã kiểm has_permission("Sales Invoice","write"); quyền tạo
+    # VN E Invoice Log được cấp cho Accounts User/Manager trong DocType JSON.
     return result

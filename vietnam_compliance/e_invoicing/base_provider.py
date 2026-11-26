@@ -283,13 +283,10 @@ class BaseEInvoiceProvider(ABC):
     # Logging helpers
     # ------------------------------------------------------------------
 
-    # S4 (ERP-Edusuccess): `ignore_permissions=True` chỉ được phép khi có đủ
-    # (1) comment giải thích — ở đây: log được ghi từ hook hệ thống/endpoint đã
-    #     kiểm `has_permission("Sales Invoice", "write")` ở utils.py,
-    # (2) API key riêng — CHƯA CHẠY: Ops phải cấp service account riêng cho
-    #     đường ghi này (xem PLAN REQ-07 / R-OPS), không được giả định có sẵn,
-    # (3) audit log — mọi insert/update để lại Version/Error Log trên site.
-    _LOG_SYSTEM_CONTEXT = "system-hook-with-si-write-permission"
+    # S4: KHÔNG dùng ignore_permissions. Quyền tạo/sửa VN E Invoice Log được
+    # cấp tường minh cho Accounts User/Accounts Manager trong DocType JSON;
+    # hook on_submit chạy dưới người dùng đã có quyền ghi Sales Invoice.
+    # Mọi insert/update để lại Version/Error Log (audit trail) trên site.
 
     def _log_pending(
         self, sales_invoice_name: str, draft: dict[str, Any], dedup: str
@@ -303,7 +300,7 @@ class BaseEInvoiceProvider(ABC):
                 "transaction_id": draft.get("draft_id", ""),
                 "deduplication_id": dedup,
             }
-        ).insert(ignore_permissions=True)
+        ).insert()
         return doc.name
 
     def _update_log(
@@ -332,7 +329,7 @@ class BaseEInvoiceProvider(ABC):
                 "status": status,
                 "error_message": _safe_traceback(),
             }
-        ).insert(ignore_permissions=True)
+        ).insert()
 
 
 def _safe_traceback() -> str:

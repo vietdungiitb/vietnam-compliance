@@ -137,7 +137,7 @@ def load_provinces() -> None:
                 "wage_region": p["wage_region"],
                 "tax_authority_code": p.get("tax_authority_code", ""),
             }
-        ).insert(ignore_permissions=True)
+        ).insert()
 
 
 def add_address_template() -> None:
@@ -162,7 +162,7 @@ def add_address_template() -> None:
             "template": template,
             "is_default": 1,
         }
-    ).insert(ignore_permissions=True)
+    ).insert()
 
 
 # ---------------------------------------------------------------------------
@@ -372,4 +372,4 @@ def delete_custom_fields() -> None:
                 "Custom Field", {"dt": dt, "fieldname": fieldname}
             )
             if name:
-                frappe.delete_doc("Custom Field", name, ignore_permissions=True)
+                frappe.delete_doc("Custom Field", name)

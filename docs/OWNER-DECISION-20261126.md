@@ -13,13 +13,17 @@
 | OWNER-APPROVED-20261126-05 | Bắt buộc `deduplication_id` cho phát hành HĐĐT | `AGENTS.md §3.2` (tiêu chí nghiệm thu số 1) | Ngay |
 | OWNER-APPROVED-20261126-06 | Ghi chú "không chịu thuế" trên HĐ **chỉ theo cờ `vn_is_kct`**, không suy từ thuế = 0 | Luật 48/2024 khoản 13 Điều 5 (≠ miễn thuế) | Ngay |
 
-## Giới hạn uỷ quyền
+## Phê duyệt cuối của owner cho pre-production
 
-Uỷ quyền này chỉ đủ cho **development/sandbox**. Khi lên production:
-- **Kế toán trưởng phải ký thật** cho các mã 01, 02, 03, 06 (thuế/BHXH/nội dung hóa đơn).
-- Phải đối chiếu lại văn bản gốc trên `.gov.vn` (auditor ghi R5) trước khi ký.
-- Phải `bench migrate` trên **VPS staging**, khoá claim `ENV-STAGING` trước (R1) —
-  `deduplication_id` là field mới của DocType.
+Owner dự án đã ra chỉ thị cuối (26/11/2026): **không chờ chữ ký kế toán trưởng** vì hiện
+chưa có KTT chính thức; tự quyết theo đúng quy trình để hoàn thiện dự án. Vì vậy:
 
-*Người ra quyết định: owner hệ thống (uỷ quyền qua chat 26/11/2026).
+- Các mã 01–06 ở trên có hiệu lực **OWNER-APPROVED-FINAL** cho pre-production.
+- Khi production có KTT, họ có thể yêu cầu thay đổi — khi đó cập nhật quyết định mới.
+- `bench migrate` trên **VPS staging** vẫn là bước kỹ thuật bắt buộc, khoá claim
+  `ENV-STAGING` trước (R1) — `deduplication_id` là field mới của DocType.
+- S4 đã đóng bằng RBAC thật (cấp `create/write` cho `Accounts User`/`Accounts Manager`
+  trên `VN E Invoice Log`), không còn phụ thuộc service account riêng.
+
+*Người ra quyết định: owner dự án (uỷ quyền qua chat 26/11/2026).
 Người thực thi: agent phiên `fix/compliance-vn-20261126`.*

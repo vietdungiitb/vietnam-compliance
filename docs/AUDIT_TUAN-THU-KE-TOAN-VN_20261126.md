@@ -286,7 +286,20 @@ Fail-before gốc: 26 failed / 2 passed trước khi sửa (`tests/test_complian
 
 **CHƯA CHẠY / CHƯA XÁC MINH (chuyển tiếp, không báo PASS):**
 - `bench migrate` VPS staging cho field `deduplication_id` unique (khoá `ENV-STAGING`, đếm log cũ).
-- Cấp service account/API key riêng cho 6 chỗ `ignore_permissions=True` (R-OPS).
-- KTT ký thật + đối chiếu văn bản gốc luật trước production.
 - `against_account` trong GL Entry; hội tụ Property Setter; render PDF 8 mẫu; 5 provider T-VAN;
   gates ERP-Edusuccess; O13 (hai nguồn tính lương) — backlog riêng.
+
+## 12. Quyết định cuối của owner — pre-production (26/11/2026)
+
+Owner dự án ra chỉ thị: **không chờ KTT** (hiện chưa có KTT chính thức), tự quyết theo đúng
+quy trình để hoàn thiện dự án. Mục 10.6/10.7 ở trên là reservation của auditor ở thời điểm
+đó; giờ được owner chốt lại như sau:
+
+| Reservation cũ | Quyết định owner |
+|---|---|
+| R-OPS: service account cho 6 chỗ `ignore_permissions=True` | **ĐÓNG**: bỏ hoàn toàn `ignore_permissions=True`; cấp `create/write` cho `Accounts User`/`Accounts Manager` trên `VN E Invoice Log` (RBAC thật) |
+| KTT ký thuế/BHXH/KCT | **OWNER-APPROVED-FINAL** cho pre-production (`docs/OWNER-DECISION-20261126.md`); KTT khi có ở production sẽ yêu cầu thay đổi nếu cần |
+| R5: đối chiếu văn bản gốc | Baseline đã tra cứu từ nguồn `.gov.vn` ở mục 2; owner chấp nhận dùng baseline này cho pre-production |
+| R1: migrate staging | Vẫn là bước kỹ thuật bắt buộc — thực hiện cùng phiên này, khoá `ENV-STAGING` |
+
+Không còn gate chờ người khác để đưa hệ thống vào chạy pre-production.
