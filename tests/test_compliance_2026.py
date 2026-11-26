@@ -200,6 +200,14 @@ class TestSafetyRulesS1S2S4S5:
 
 
 class TestReportFilters:
+    def test_migrate_patch_ensures_setup_on_existing_sites(self):
+        """after_install không chạy khi nâng cấp site — bắt buộc có patch migrate."""
+        patches = (APP / "patches.txt").read_text(encoding="utf-8")
+        assert "vietnam_compliance.patches.v0_3.ensure_vn_setup" in patches
+        patch_src = _read("patches/v0_3/ensure_vn_setup.py")
+        assert "add_custom_fields()" in patch_src
+        assert "Income Tax" in patch_src and "Thuế TNCN" in patch_src
+
     def test_so_cai_uses_real_gl_field(self):
         """Đo trên staging: GL Entry có `against`, KHÔNG có `against_account`."""
         src = _read("vietnam_compliance/report/vn_so_cai/vn_so_cai.py")
