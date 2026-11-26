@@ -64,7 +64,7 @@ def execute(filters: dict | None = None) -> tuple[list[dict], list[dict]]:
         filters=period_filters,
         fields=[
             "posting_date", "voucher_type", "voucher_no",
-            "against_account", "remarks", "debit", "credit",
+            "against", "remarks", "debit", "credit",
         ],
         order_by="posting_date, creation",
     )
@@ -88,7 +88,7 @@ def execute(filters: dict | None = None) -> tuple[list[dict], list[dict]]:
             "voucher_type": entry.voucher_type,
             "voucher_no": entry.voucher_no,
             "remarks": entry.remarks or "",
-            "against_account": entry.against_account or "",
+            "against_account": entry.against or "",
             "debit": entry.debit or 0,
             "credit": entry.credit or 0,
             "balance": balance,

@@ -200,6 +200,12 @@ class TestSafetyRulesS1S2S4S5:
 
 
 class TestReportFilters:
+    def test_so_cai_uses_real_gl_field(self):
+        """Đo trên staging: GL Entry có `against`, KHÔNG có `against_account`."""
+        src = _read("vietnam_compliance/report/vn_so_cai/vn_so_cai.py")
+        assert '"against"' in src
+        assert "entry.against_account" not in src
+
     def test_company_is_mandatory(self):
         for rel in (
             "vietnam_compliance/report/vn_so_cai/vn_so_cai.py",
