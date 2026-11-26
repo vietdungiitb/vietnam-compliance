@@ -140,8 +140,9 @@ def ensure_patched(bootinfo=None):
     # ERPNext calls get_chart() on the chart name and expects a non-None dict.
     # For our VN charts, get_chart returns just the account tree dict (which
     # supports .get() so it doesn't crash). But for safety we also wrap the
-    # function to skip syncing entirely when our chart is selected — Vietnamese
-    # report templates can be added later via VN-specific reports.
+    # function to skip syncing entirely when our chart is selected — VN có 2
+    # script report riêng (VN Bảng Cân Đối Kế Toán / VN Báo Cáo Kết Quả Kinh Doanh)
+    # dùng Account.root_type nên không phụ thuộc template tiếng Anh của ERPNext.
     _original_sync = _frt_mod.sync_financial_report_templates
 
     def _patched_sync(chart_of_accounts=None, existing_company=None):

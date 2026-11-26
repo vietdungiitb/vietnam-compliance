@@ -15,7 +15,11 @@ from vietnam_compliance.payroll.insurance_calculator import (
     _DEFAULTS,
     calculate_insurance,
 )
-from vietnam_compliance.payroll.pit_calculator import TAX_BRACKETS, calculate_pit
+from vietnam_compliance.payroll.pit_calculator import (
+    TAX_BRACKETS,
+    calculate_cumulative_withholding,
+    calculate_pit,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "vietnam_compliance"
@@ -48,6 +52,17 @@ class TestPIT5Brackets2026:
         )
         assert result.tax_amount == expected
         assert result.bracket == bracket
+
+    def test_cumulative_withholding(self):
+        # Không giảm trừ để kiểm chứng thuần lũy kế:
+        # T1: 10tr × 5% = 500k; T2: 40tr × 20% − 3,5tr = 4,5tr ⇒ thêm 4,0tr.
+        got = calculate_cumulative_withholding(
+            [10_000_000, 30_000_000],
+            num_dependents=0,
+            personal_deduction=0,
+            dependent_deduction=0,
+        )
+        assert got == [500_000, 4_000_000]
 
     def test_old_seven_bracket_table_is_gone(self):
         limits = [row[0] for row in TAX_BRACKETS]
@@ -200,6 +215,15 @@ class TestSafetyRulesS1S2S4S5:
 
 
 class TestReportFilters:
+    def test_vn_financial_statements_exist(self):
+        """TT 99: có BCTC riêng thay template ERPNext bị skip cho CoA VN."""
+        for name in ("vn_bang_can_doi_ke_toan", "vn_bao_cao_ket_qua_kinh_doanh"):
+            folder = APP / "vietnam_compliance/report" / name
+            assert (folder / f"{name}.py").exists()
+            assert (folder / f"{name}.json").exists()
+            src = (folder / f"{name}.py").read_text(encoding="utf-8")
+            assert '"company"' in src and "frappe.throw" in src
+
     def test_migrate_patch_ensures_setup_on_existing_sites(self):
         """after_install không chạy khi nâng cấp site — bắt buộc có patch migrate."""
         patches = (APP / "patches.txt").read_text(encoding="utf-8")

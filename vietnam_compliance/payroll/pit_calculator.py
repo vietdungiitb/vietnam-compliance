@@ -123,6 +123,51 @@ def calculate_pit(
     )
 
 
+def calculate_cumulative_withholding(
+    monthly_taxable_incomes: list[float],
+    num_dependents: int = 0,
+    personal_deduction: float | None = None,
+    dependent_deduction: float | None = None,
+) -> list[float]:
+    """Tính thuế khấu trừ từng tháng theo phương pháp **lũy kế**.
+
+    Công thức: ``thuế tháng N = thuế(lũy kế đến N) − tổng thuế đã khấu trừ``.
+    Khác với tính từng tháng độc lập: thu nhập không đều trong năm vẫn khớp
+    biểu thuế lũy tiến của kỳ tính thuế (Luật 109/2025/QH15, NĐ 253/2026).
+
+    Args:
+        monthly_taxable_incomes: Thu nhập tính thuế của từng tháng (đã trừ BH).
+        num_dependents: Số người phụ thuộc.
+        personal_deduction / dependent_deduction: Override mức giảm trừ.
+
+    Returns:
+        Danh sách số thuế phải khấu trừ cho từng tháng.
+    """
+    if personal_deduction is None or dependent_deduction is None:
+        personal_deduction, dependent_deduction = _resolve_deductions(
+            personal_deduction, dependent_deduction
+        )
+
+    withheld = 0.0
+    result: list[float] = []
+    cumulative = 0.0
+    for month_index, taxable in enumerate(monthly_taxable_incomes, start=1):
+        cumulative += max(0.0, float(taxable))
+        # Giảm trừ được cộng dồn theo SỐ THÁNG, không trừ mỗi tháng một lần
+        # trên tổng thu nhập lũy kế.
+        cumulative_tax = calculate_pit(
+            cumulative,
+            0,
+            num_dependents=num_dependents,
+            personal_deduction=(personal_deduction or 0) * month_index,
+            dependent_deduction=(dependent_deduction or 0) * month_index,
+        ).tax_amount
+        monthly = max(0.0, cumulative_tax - withheld)
+        result.append(monthly)
+        withheld += monthly
+    return result
+
+
 def _resolve_deductions(
     personal: Optional[float], dependent: Optional[float]
 ) -> tuple[float, float]:
