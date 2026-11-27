@@ -124,15 +124,14 @@ def _find_account(company: str, account_number_prefixes: list[str]) -> str | Non
     return None
 
 
-def get_round_off_accounts(company: str, account_list=None, doc=None) -> dict:
-    """Return the round-off account for Vietnam.
+def get_round_off_accounts(company: str, account_list=None, doc=None) -> list[str]:
+    """Trả về DANH SÁCH tài khoản làm tròn cho Việt Nam.
 
-    Regional override for
-    ``erpnext.controllers.taxes_and_totals.get_regional_round_off_accounts``.
+    Regional override cho ``erpnext.controllers.taxes_and_totals``. Phải trả
+    `list[str]` vì ERPNext v16 dùng kết quả này ở cả server (`in`,
+    `taxes_and_totals.py:843,855`) lẫn client (`push(...r.message)` rồi
+    `.includes()` tại `taxes_and_totals.js:327,755,769`). Bản cũ trả `dict`
+    ⇒ client nổ `TypeError: Spread syntax requires ...iterable`.
     """
     abbr = frappe.get_cached_value("Company", company, "abbr")
-    cost_center = frappe.get_cached_value("Company", company, "cost_center")
-    return {
-        "round_off_account": f"6428 - Chi phí bằng tiền khác - {abbr}",
-        "round_off_cost_center": cost_center,
-    }
+    return [f"6428 - Chi phí bằng tiền khác - {abbr}"]
